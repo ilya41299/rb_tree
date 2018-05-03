@@ -9,7 +9,7 @@ class rb_tree {
 		node_t * left;
 		node_t * right;
 		node_t * parent;
-		bool color; // 0 - black, 1 - red
+		bool color; // false - black, true - red
 		T value;
 	};
 	node_t *root_;
