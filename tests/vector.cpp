@@ -3,252 +3,99 @@
 
 #include "vector.hpp"
 
-TEST_CASE("creating vector")
+TEST_CASE("Сreating tree")
 {
-	vector_t<int> vector;
-	REQUIRE( vector.size() == 0 );
-	REQUIRE( vector.capacity() == 0 );
+	tree_t<int> My_tree;
+	REQUIRE( My_tree.root() == nullptr );
+	REQUIRE( My_tree == nullptr );
 }
 
-TEST_CASE("copying vector")
+TEST_CASE("Add elements in tree")
 {
-	vector_t<int> vector;
-	vector.push_back(1);
-
-	vector_t<int> copy(vector);
-	REQUIRE( copy == vector );
+	tree_t<int> My_tree;
+	My_tree.insert(7);
+	My_tree.insert(3);
+	My_tree.insert(9);
+	My_tree.insert(6);
+	std::ostringstream ostream;
+	My_tree.print(ostream, 0, My_tree.root());
+	std::string output{
+		"---9\n"
+		"7\n"
+		"------6\n"
+		"---3\n"};
+	REQUIRE(output == ostream.str());
 }
 
-TEST_CASE("assigning vector")
+TEST_CASE("Check root tree")
 {
-	vector_t<int> vector1;
-	vector_t<int> vector2;
+  tree_t<int> My_tree;
+  My_tree.insert(7);
+  My_tree.insert(3);
+  My_tree.insert(9); 
 
-	vector1.push_back(1);
-	vector2.push_back(2);
-
-	vector1 = vector2;
-	REQUIRE( vector1 == vector2 );
+  REQUIRE(My_tree.find(9) == true);
+  REQUIRE(My_tree.find(2) == false);
 }
 
-TEST_CASE("equaling vector")
+
+TEST_CASE("Check operator tree '+' and '=' ")
 {
-	vector_t<int> vector1;
-	vector_t<int> vector2;
-
-	vector1.push_back(1);
-	vector2.push_back(1);
-
-	REQUIRE( vector1 == vector2 );
-
-	vector1.push_back(2);
-	REQUIRE( vector1 != vector2 );
+	tree_t<int> My_tree;
+	std::ostringstream ostream;
+	My_tree.check_operator(ostream, '+', 7);
+	My_tree.check_operator(ostream, '+', 3);
+	My_tree.check_operator(ostream, '+', 9);
+	My_tree.check_operator(ostream, '+', 6);
+	std::string output {
+		"---9\n"
+		"7\n"
+		"------6\n"
+		"---3\n"};
+	My_tree.check_operator (ostream, '=', 0);
+	
+	REQUIRE(output == ostream.str());
 }
-
-TEST_CASE("indexing vector")
+TEST_CASE("Check operator tree '?' ")
 {
-	vector_t<int> vector;
-
-	vector.push_back(1);
-
-	REQUIRE( vector[0] == 1 );
-
-	vector_t<int> const copy(vector);
-	REQUIRE( copy[0] == 1 );
+	tree_t<int> My_tree;
+	My_tree.insert(7);
+	My_tree.insert(3);
+	My_tree.insert(9); 
+	std::ostringstream ostream;
+	My_tree.check_operator (ostream, '?', 3);
+	REQUIRE(ostream.str() == "true");
 }
-
-TEST_CASE("pushing elements")
+	
+//
+TEST_CASE(" initializer_list ")
 {
-	vector_t<int> vector;
-
-	vector.push_back(1);
-	REQUIRE( vector.size() == 1 );
-	REQUIRE( vector.capacity() == 1 );
-
-	vector.push_back(2);
-	REQUIRE( vector.size() == 2 );
-	REQUIRE( vector.capacity() == 2 );
-
-	vector.push_back(3);
-	REQUIRE( vector.size() == 3 );
-	REQUIRE( vector.capacity() == 4 );
-
-	vector.push_back(4);
-	REQUIRE( vector.size() == 4 );
-	REQUIRE( vector.capacity() == 4 );
-
-	vector.push_back(5);
-	REQUIRE( vector.size() == 5 );
-	REQUIRE( vector.capacity() == 8 );
+	std::initializer_list <int> list{ 7, 3, 9, 6};
+	tree_t<int> My_tree(list);
+	std::ostringstream ostream;
+	My_tree.print(ostream, 0, My_tree.root());
+	std::string output {
+		"---9\n"
+		"7\n"
+		"------6\n"
+		"---3\n"};
+	REQUIRE(output == ostream.str());
 }
 
-TEST_CASE("poping elements")
-{
-	vector_t<int> vector;
-
-	vector.push_back(1);
-	vector.push_back(2);
-	vector.push_back(3);
-	vector.push_back(4);
-	vector.push_back(5);
-	vector.push_back(6);
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 5 );
-	REQUIRE( vector.capacity() == 8 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 4 );
-	REQUIRE( vector.capacity() == 8 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 3 );
-	REQUIRE( vector.capacity() == 8 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 2 );
-	REQUIRE( vector.capacity() == 4 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 1 );
-	REQUIRE( vector.capacity() == 2 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 0 );
-	REQUIRE( vector.capacity() == 1 );
+TEST_CASE(" operator== true")
+{	
+	std::initializer_list <int> list{ 7, 3, 9, 6};
+	tree_t<int> My_tree_1(list);
+	tree_t<int> My_tree_2(list);
+	REQUIRE(My_tree_1 == My_tree_2);
 }
 
-	TEST_CASE("error") 
-{ 
-	vector_t<int> vector; 
-	vector.push_back(4);
-	vector.push_back(2); 
-	vector.push_back(9); 
-	REQUIRE_THROWS_AS(vector.at(4), std::out_of_range); 
+TEST_CASE(" operator== false")
+{	
+	std::initializer_list <int> list_1{ 7, 3, 9, 6};
+	std::initializer_list <int> list_2{ 7, 3, 9};
+	tree_t<int> My_tree_1(list_1);
+	tree_t<int> My_tree_2(list_2);
+	REQUIRE(!(My_tree_1 == My_tree_2));
 }
 
-//float
-
-TEST_CASE("creating vector_F")
-{
-	vector_t<float> vector;
-	REQUIRE( vector.size() == 0 );
-	REQUIRE( vector.capacity() == 0 );
-}
-
-TEST_CASE("copying vector_F")
-{
-	vector_t<float> vector;
-	vector.push_back(1.2);
-
-	vector_t<float> copy(vector);
-	REQUIRE( copy == vector );
-}
-
-TEST_CASE("assigning vector_F")
-{
-	vector_t<float> vector1;
-	vector_t<float> vector2;
-
-	vector1.push_back(1.1);
-	vector2.push_back(2.2);
-
-	vector1 = vector2;
-	REQUIRE( vector1 == vector2 );
-}
-
-TEST_CASE("equaling vector_F")
-{
-	vector_t<float> vector1;
-	vector_t<float> vector2;
-
-	vector1.push_back(1.3);
-	vector2.push_back(1.3);
-
-	REQUIRE( vector1 == vector2 );
-
-	vector1.push_back(2.3);
-	REQUIRE( vector1 != vector2 );
-}
-
-TEST_CASE("indexing vector_F")
-{
-	vector_t<float> vector;
-
-	vector.push_back(1.4);
-
-	REQUIRE( vector[0] == 1.4f);
-
-	vector_t<float> const copy(vector);
-	REQUIRE( copy[0] == 1.4f);
-}
-
-TEST_CASE("pushing elements_F")
-{
-	vector_t<float> vector;
-
-	vector.push_back(1.1);
-	REQUIRE( vector.size() == 1 );
-	REQUIRE( vector.capacity() == 1 );
-
-	vector.push_back(2.2);
-	REQUIRE( vector.size() == 2 );
-	REQUIRE( vector.capacity() == 2 );
-
-	vector.push_back(3.3);
-	REQUIRE( vector.size() == 3 );
-	REQUIRE( vector.capacity() == 4 );
-
-	vector.push_back(4.1);
-	REQUIRE( vector.size() == 4 );
-	REQUIRE( vector.capacity() == 4 );
-
-	vector.push_back(5.2);
-	REQUIRE( vector.size() == 5 );
-	REQUIRE( vector.capacity() == 8 );
-}
-
-TEST_CASE("poping elements_F")
-{
-	vector_t<float> vector;
-
-	vector.push_back(1.0);
-	vector.push_back(2.0);
-	vector.push_back(3.3);
-	vector.push_back(4.2);
-	vector.push_back(5.1);
-	vector.push_back(6.4);
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 5 );
-	REQUIRE( vector.capacity() == 8 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 4 );
-	REQUIRE( vector.capacity() == 8 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 3 );
-	REQUIRE( vector.capacity() == 8 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 2 );
-	REQUIRE( vector.capacity() == 4 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 1 );
-	REQUIRE( vector.capacity() == 2 );
-
-	vector.pop_back();
-	REQUIRE( vector.size() == 0 );
-	REQUIRE( vector.capacity() == 1 );
-}
-
-	TEST_CASE("error_f") 
-{ 
-	vector_t<float> vector; 
-	vector.push_back(1.4);
-	vector.push_back(5.2); 
-	vector.push_back(8.7); 
-	REQUIRE_THROWS_AS(vector.at(4), std::out_of_range); 
-}
