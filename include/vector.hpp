@@ -59,7 +59,7 @@ public:
 
 	void rotate_left(node_t *n)
 	{
-		struct node *vetka = n->right;
+		 node_t *vetka = n->right;
 
 		vetka->parent = n->parent; /* при этом, возможно, vetka становится корнем дерева */
 		if (n->parent != nullptr) { // если у n есть отец
@@ -71,8 +71,9 @@ public:
 
 		n->right = vetka->left; // переопределип правый указатель для n
 		if (vetka->left != nullptr) // и если временный имеет левого сына
+		{
 			vetka->left->parent = n; // то его отцом станет n
-
+		}
 		n->parent = vetka; // отцом для n становится временный элемент
 		vetka->left = n; // и левый указатель временного направляем на наш n  
 	}
@@ -159,7 +160,7 @@ public:
 	но теперь задача сводится к Случаю 5.*/
 	void insert_case4(node_t *vetka)
 	{
-		struct node *g = grandparent(vetka);
+		 node_t *g = grandparent(vetka);
 
 		if ((vetka == vetka->parent->right) && (vetka->parent == g->left)) {
 			rotate_left(vetka->parent);
@@ -184,7 +185,7 @@ public:
 	В каждом случае, из этих трёх узлов только один окрашен в чёрный.*/
 	void insert_case5(node_t *vetka)
 	{
-		struct node *g = grandparent(vetka);
+		 node_t *g = grandparent(vetka);
 
 		vetka->parent->color = false;
 		g->color = true;
@@ -207,7 +208,7 @@ void rb_tree<T>::insert(T value)
 		node->value = value;
 		node->right = nullptr;
 		node->left = nullptr;
-		root_->parent = nullptr;
+		node->parent = nullptr;
 		node->color = false;
 		root_ = node;
 	}
@@ -244,15 +245,14 @@ void rb_tree<T>::insert(T value)
 				{
 					vetka->right = new node_t;
 					vetka->right->parent = vetka;
-					vetka = vetka->left;
-					vetka->value = value;
+					vetka = vetka->right;
 					vetka->right = nullptr;
 					vetka->right = nullptr;
 					vetka->value = value;
 					vetka->color = true;
 					insert_case1(vetka);
 					return;
-				};
+				}
 				else vetka = vetka->right;
 			}
 		}
