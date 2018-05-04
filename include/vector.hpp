@@ -267,7 +267,7 @@ rb_tree<T>::rb_tree(std::initializer_list<T> keys)
 	const int* _ptr = keys.begin();
 	for (auto i: keys)
 	{
-		insert(_ptr[i]);
+		insert(_ptr[i-1]);
 	}
 }
 
