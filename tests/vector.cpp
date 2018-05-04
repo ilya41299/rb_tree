@@ -5,13 +5,13 @@
 
 TEST_CASE("Сreating tree")
 {
-	tree_t<int> My_tree;
+	rb_tree<int> My_tree;
 	REQUIRE( My_tree.root() == nullptr );
 }
 
 TEST_CASE("Add elements in tree left rotate")
 {
-	tree_t<int> My_tree{1, 2, 3, 4, 5, 6, 7};
+	rb_tree<int> My_tree{1, 2, 3, 4, 5, 6, 7};
 
 	std::ostringstream ostream;
 	My_tree.print(ostream, 0, My_tree.root());
@@ -30,7 +30,7 @@ TEST_CASE("Add elements in tree left rotate")
 
 TEST_CASE("Add elements in tree right rotate")
 {
-	tree_t<int> My_tree{7, 6, 5, 4, 3, 2, 1};
+	rb_tree<int> My_tree{7, 6, 5, 4, 3, 2, 1};
 	
 	std::ostringstream ostream;
 	My_tree.print(ostream, 0, My_tree.root());
