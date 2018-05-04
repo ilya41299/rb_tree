@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cassert>
 
+
 template <typename T>
 class rb_tree {
 	struct node_t {
@@ -60,7 +61,10 @@ public:
 	void rotate_left(node_t *n)
 	{
 		 node_t *vetka = n->right;
-
+		 if (root_ == n) // Если поворот вокруг корня, то корень дерева переопределяем
+		 {
+			 root_ = n->right;
+		 }
 		vetka->parent = n->parent; /* при этом, возможно, vetka становится корнем дерева */
 		if (n->parent != nullptr) { // если у n есть отец
 			if (n->parent->left == n) // и n-его левый сын
@@ -81,7 +85,10 @@ public:
 	void rotate_right(node_t *n) 
 	{
 		 node_t *vetka = n->left;
-
+		 if (root_ == n) // Если поворот вокруг корня, то корень дерева переопределяем
+		 {
+			 root_ = n->left;
+		 }
 		vetka->parent = n->parent; 
 		if (n->parent != nullptr) {
 			if (n->parent->left == n)
@@ -247,7 +254,7 @@ void rb_tree<T>::insert(T value)
 					vetka->right->parent = vetka;
 					vetka = vetka->right;
 					vetka->right = nullptr;
-					vetka->right = nullptr;
+					vetka->left = nullptr;
 					vetka->value = value;
 					vetka->color = true;
 					insert_case1(vetka);
