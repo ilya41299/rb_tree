@@ -24,7 +24,7 @@ TEST_CASE("Add elements in tree left rotate")
 		"------3\n"
 		"2\n"
 		"---1\n"
-	}
+	};
 	REQUIRE(output == ostream.str());
 }
 
@@ -43,6 +43,6 @@ TEST_CASE("Add elements in tree right rotate")
 		"---------3\n"
 		"------2\n"
 		"---------1\n"
-	}
+	};
 	REQUIRE(output == ostream.str());
 }
