@@ -264,10 +264,10 @@ template <typename T>
 rb_tree<T>::rb_tree(std::initializer_list<T> keys)
 {
 	root_ = nullptr;
-	const int* _ptr = keys.begin();
+	
 	for (auto i: keys)
 	{
-		insert(_ptr[i-1]);
+		insert(i);
 	}
 }
 
