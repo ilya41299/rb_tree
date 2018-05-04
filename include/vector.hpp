@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <cassert>
 
-
 template <typename T>
 class rb_tree {
 	struct node_t {
@@ -36,22 +35,22 @@ public:
 		}
 		return false;
 	}
-	node_t * grandparent(node_t * n) 
+	node_t * grandparent(node_t * n) const
 	{
-		if (n != nullptr && n->parent != nullptr) 
+		if (n != nullptr && n->parent != nullptr)
 		{
 			return n->parent->parent;
 		}
 		else return nullptr;
 	}
-	node_t * uncle(node_t * n)
+	node_t * uncle(node_t * n) const
 	{
 		node_t * grand = grandparent(n);
-		if (grand == nullptr) 
+		if (grand == nullptr)
 		{
 			return nullptr; // если не существует grand, то нет и uncle
 		}
-		else if (n->parent == grand->left) 
+		else if (n->parent == grand->left)
 		{
 			return grand->right;
 		}
@@ -60,11 +59,11 @@ public:
 
 	void rotate_left(node_t *n)
 	{
-		 node_t *vetka = n->right;
-		 if (root_ == n) // Если поворот вокруг корня, то корень дерева переопределяем
-		 {
-			 root_ = n->right;
-		 }
+		node_t *vetka = n->right;
+		if (root_ == n) // Если поворот вокруг корня, то корень дерева переопределяем
+		{
+			root_ = n->right;
+		}
 		vetka->parent = n->parent; /* при этом, возможно, vetka становится корнем дерева */
 		if (n->parent != nullptr) { // если у n есть отец
 			if (n->parent->left == n) // и n-его левый сын
@@ -82,14 +81,14 @@ public:
 		vetka->left = n; // и левый указатель временного направляем на наш n  
 	}
 
-	void rotate_right(node_t *n) 
+	void rotate_right(node_t *n)
 	{
-		 node_t *vetka = n->left;
-		 if (root_ == n) // Если поворот вокруг корня, то корень дерева переопределяем
-		 {
-			 root_ = n->left;
-		 }
-		vetka->parent = n->parent; 
+		node_t *vetka = n->left;
+		if (root_ == n) // Если поворот вокруг корня, то корень дерева переопределяем
+		{
+			root_ = n->left;
+		}
+		vetka->parent = n->parent;
 		if (n->parent != nullptr) {
 			if (n->parent->left == n)
 				n->parent->left = vetka;
@@ -118,10 +117,10 @@ public:
 	}
 
 	/*Предок P текущего узла чёрный, то есть Свойство 4 (Оба потомка каждого красного узла — чёрные) не нарушается.
-	В этом случае дерево остаётся корректным. 
-	Свойство 5 (Все пути от любого данного узла до листовых узлов содержат одинаковое число чёрных узлов) не нарушается, 
+	В этом случае дерево остаётся корректным.
+	Свойство 5 (Все пути от любого данного узла до листовых узлов содержат одинаковое число чёрных узлов) не нарушается,
 	потому что текущий узел N имеет двух чёрных листовых потомков, но так как N является красным,
-	путь до каждого из этих потомков содержит такое же число чёрных узлов, что и путь до чёрного листа, 
+	путь до каждого из этих потомков содержит такое же число чёрных узлов, что и путь до чёрного листа,
 	который был заменен текущим узлом, так что свойство остается верным.*/
 	void insert_case2(node_t *vetka)
 	{
@@ -131,10 +130,10 @@ public:
 			insert_case3(vetka);
 	}
 
-	/* Если и родитель P и дядя U — красные, то они оба могут быть перекрашены в чёрный и дедушка G станет красным 
+	/* Если и родитель P и дядя U — красные, то они оба могут быть перекрашены в чёрный и дедушка G станет красным
 	(для сохранения свойства 5 (Все пути от любого данного узла до листовых узлов содержат одинаковое число чёрных узлов)).
 	Теперь у текущего красного узла N чёрный родитель. Так как любой путь через родителя или дядю должен проходить через дедушку,
-	число чёрных узлов в этих путях не изменится. Однако, дедушка G теперь может нарушить свойства 2 (Корень — чёрный) 
+	число чёрных узлов в этих путях не изменится. Однако, дедушка G теперь может нарушить свойства 2 (Корень — чёрный)
 	или 4 (Оба потомка каждого красного узла — чёрные) (свойство 4 может быть нарушено, так как родитель G может быть красным).
 	Чтобы это исправить, вся процедура рекурсивно выполняется на G из случая 1.*/
 	void insert_case3(node_t *vetka)
@@ -155,19 +154,19 @@ public:
 		}
 	}
 
-	/*Случай 4: Родитель P является красным, но дядя U — чёрный. 
-	Также, текущий узел N — правый потомок P, а P в свою очередь — левый потомок своего предка G. 
-	В этом случае может быть произведен поворот дерева, который меняет роли текущего узла N и его предка P. 
+	/*Случай 4: Родитель P является красным, но дядя U — чёрный.
+	Также, текущий узел N — правый потомок P, а P в свою очередь — левый потомок своего предка G.
+	В этом случае может быть произведен поворот дерева, который меняет роли текущего узла N и его предка P.
 	Тогда, для бывшего родительского узла P в обновленной структуре используем случай 5,
 	потому что Свойство 4 (Оба потомка любого красного узла — чёрные) все ещё нарушено.
-	Вращение приводит к тому, что некоторые пути (в поддеревe) проходят через узел N, чего не было до этого. 
-	Это также приводит к тому, что некоторые пути не проходят через узел P. 
+	Вращение приводит к тому, что некоторые пути (в поддеревe) проходят через узел N, чего не было до этого.
+	Это также приводит к тому, что некоторые пути не проходят через узел P.
 	Однако, оба эти узла являются красными, так что Свойство 5 (Все пути от любого данного узла до листовых узлов
-	содержат одинаковое число чёрных узлов) не нарушается при вращении. Однако Свойство 4 всё ещё нарушается, 
+	содержат одинаковое число чёрных узлов) не нарушается при вращении. Однако Свойство 4 всё ещё нарушается,
 	но теперь задача сводится к Случаю 5.*/
 	void insert_case4(node_t *vetka)
 	{
-		 node_t *g = grandparent(vetka);
+		node_t *g = grandparent(vetka);
 
 		if ((vetka == vetka->parent->right) && (vetka->parent == g->left)) {
 			rotate_left(vetka->parent);
@@ -192,7 +191,7 @@ public:
 	В каждом случае, из этих трёх узлов только один окрашен в чёрный.*/
 	void insert_case5(node_t *vetka)
 	{
-		 node_t *g = grandparent(vetka);
+		node_t *g = grandparent(vetka);
 
 		vetka->parent->color = false;
 		g->color = true;
@@ -208,13 +207,16 @@ public:
 template <typename T>
 void rb_tree<T>::insert(T value)
 {
-// Вставка в пустое дерево. Достаточно вставить чёрный элемент 
-	if (root_ == nullptr) 
-	{
-		node_t* node = new node_t;
+	// Вставка в пустое дерево. Достаточно вставить чёрный элемент 
+
+	node_t* node = new node_t;
 		node->value = value;
 		node->right = nullptr;
 		node->left = nullptr;
+		vetka->color = true;
+
+	if (root_ == nullptr)
+	{
 		node->parent = nullptr;
 		node->color = false;
 		root_ = node;
@@ -223,41 +225,31 @@ void rb_tree<T>::insert(T value)
 	//Иначе происходит поиск места для вставка красного элемента
 	else
 	{
-		node_t* vetka = root_; 
+		node_t* vetka = root_;
 		while (vetka != nullptr)
 		{
 			if (vetka->value > value)
 			{
 				// если левый сын отсутствует
-				if (vetka->left==nullptr) 
+				if (vetka->left == nullptr)
 				{
-					vetka->left = new node_t; //выделяем память и заполняем структуру элемента
-					vetka->left->parent = vetka;
-					vetka = vetka->left;
-					vetka->right = nullptr;
-					vetka->left = nullptr;
-					vetka->value = value;
-					vetka->color = true;
-					insert_case1(vetka); //вызываем функцию для возможной перекраски или поворота
+					vetka->left = node; //выделяем память и заполняем структуру элемента
+					node->parent = vetka;
+					insert_case1(node); //вызываем функцию для возможной перекраски или поворота
 					return;
 				}
-				else 
+				else
 				{
 					vetka = vetka->left;
 				};
 			}
 			else if (vetka->value <= value)
 			{
-				if (vetka->right==nullptr) 
+				if (vetka->right == nullptr)
 				{
-					vetka->right = new node_t;
-					vetka->right->parent = vetka;
-					vetka = vetka->right;
-					vetka->right = nullptr;
-					vetka->left = nullptr;
-					vetka->value = value;
-					vetka->color = true;
-					insert_case1(vetka);
+					vetka->right = node;
+					node->parent = vetka;
+					insert_case1(node);
 					return;
 				}
 				else vetka = vetka->right;
