@@ -213,7 +213,7 @@ void rb_tree<T>::insert(T value)
 		node->value = value;
 		node->right = nullptr;
 		node->left = nullptr;
-		vetka->color = true;
+		node->color = true;
 
 	if (root_ == nullptr)
 	{
