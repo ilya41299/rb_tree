@@ -204,8 +204,7 @@ public:
 	}
 
 	// Для удаления
-	
-template <typename T>
+
 	bool remove(T value)
 	{
 		if (root_ == nullptr)
