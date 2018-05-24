@@ -322,18 +322,19 @@ void rb_tree<T>::check_operator(std::ostream& stream, char op, T value)
 template <typename T>
 void rb_tree<T>::print(std::ostream& stream, int level, node_t* node)
 {
-	if (node == nullptr)
-		return;
+	 if (node == nullptr)
+      return;
 
-	print(stream, level + 1, node->right);
+    print(stream, level + 1, node->right);
 
-	for (size_t i = 0; i < level; i++)
-	{
-		stream << "---";
-	}
-	stream << node->value << std::endl;
-
-	print(stream, level + 1, node->left);
+    for (unsigned int i = 0; i < level; i++) {
+      stream << "---";
+    }
+    if (node->color == false)
+      stream << node->value << "B" << std::endl;
+    if (node->color == true)
+      stream << node->value << "R" << std::endl;
+    print(stream, level + 1, node->left);
 }
 
 template <typename T>
