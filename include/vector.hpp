@@ -202,200 +202,9 @@ public:
 			rotate_left(g);
 		}
 	}
-};
 
-template <typename T>
-void rb_tree<T>::insert(T value)
-{
-	// Вставка в пустое дерево. Достаточно вставить чёрный элемент 
-
-	node_t* node = new node_t;
-		node->value = value;
-		node->right = nullptr;
-		node->left = nullptr;
-		node->color = true;
-
-	if (root_ == nullptr)
-	{
-		node->parent = nullptr;
-		node->color = false;
-		root_ = node;
-	}
-
-	//Иначе происходит поиск места для вставка красного элемента
-	else
-	{
-		node_t* vetka = root_;
-		while (vetka != nullptr)
-		{
-			if (vetka->value > value)
-			{
-				// если левый сын отсутствует
-				if (vetka->left == nullptr)
-				{
-					vetka->left = node; //выделяем память и заполняем структуру элемента
-					node->parent = vetka;
-					insert_case1(node); //вызываем функцию для возможной перекраски или поворота
-					return;
-				}
-				else
-				{
-					vetka = vetka->left;
-				};
-			}
-			else if (vetka->value <= value)
-			{
-				if (vetka->right == nullptr)
-				{
-					vetka->right = node;
-					node->parent = vetka;
-					insert_case1(node);
-					return;
-				}
-				else vetka = vetka->right;
-			}
-		}
-	}
-}
-
-
-
-template <typename T>
-rb_tree<T>::rb_tree(std::initializer_list<T> keys)
-{
-	root_ = nullptr;
+	// Для удаления
 	
-	for (auto i: keys)
-	{
-		insert(i);
-	}
-}
-
-template <typename T>
-rb_tree<T>::rb_tree()
-{
-	root_ = nullptr;
-}
-
-template <typename T>
-rb_tree<T>::~rb_tree()
-{
-	destroy(root_);
-}
-
-template <typename T>
-void rb_tree<T>::check_operator(std::ostream& stream, char op, T value)
-{
-	switch (op)
-	{
-	case '+':
-	{
-		insert(value);
-		break;
-	}
-	case '?':
-	{
-		if (find(value))
-		{
-			stream << "true";
-		}
-		else stream << "false";
-		break;
-	}
-	case '=':
-	{
-		print(stream, 0, root_);
-		break;
-	}
-	case 'q':
-	{
-		exit(0);
-		break;
-	}
-	default:
-	{
-		stream << "Error of use operator";
-	}
-	}
-}
-
-template <typename T>
-void rb_tree<T>::print(std::ostream& stream, int level, node_t* node)
-{
-	 if (node == nullptr)
-      return;
-
-    print(stream, level + 1, node->right);
-
-    for (unsigned int i = 0; i < level; i++) {
-      stream << "---";
-    }
-    if (node->color == false)
-      stream << node->value << "B" << std::endl;
-    if (node->color == true)
-      stream << node->value << "R" << std::endl;
-    print(stream, level + 1, node->left);
-}
-
-template <typename T>
-bool rb_tree<T>::find(T value) const
-{
-	node_t* node = root_;
-	while (node != nullptr)
-	{
-		if (node->value == value)
-		{
-			return true;
-		}
-		else
-		{
-			if (value <= node->value)
-			{
-				node = node->left;
-			}
-			else
-				node = node->right;
-		}
-	}
-	return false;
-}
-
-template <typename T>
-void rb_tree<T>::destroy(node_t* node)
-{
-	if (node != nullptr)
-	{
-		if (node->left)
-		{
-			destroy(node->left);
-		}
-		if (node->right)
-		{
-			destroy(node->right);
-		}
-		delete node;
-	}
-}
-
-template <typename T>
-bool rb_tree<T>::equal(node_t* first, node_t* second) const {
-	if (first == nullptr && second == nullptr) return(true);
-	else if (first != nullptr && second != nullptr)
-	{
-		return(
-			first->value == second->value &&
-			equal(first->left, second->left) &&
-			equal(first->right, second->right)
-			);
-	}
-	else return false;
-}
-
-template <typename T>
-auto rb_tree<T>::operator==(rb_tree const & other) const {
-	node_t* first = root_; node_t* second = other.root_;
-	return (equal(first, second));
-}
 
 	bool remove(T value)
 	{
@@ -791,3 +600,145 @@ void rb_tree<T>::insert(T value)
 		}
 	}
 }
+
+
+
+template <typename T>
+rb_tree<T>::rb_tree(std::initializer_list<T> keys)
+{
+	root_ = nullptr;
+
+	for (auto i : keys)
+	{
+		insert(i);
+	}
+}
+
+template <typename T>
+rb_tree<T>::rb_tree()
+{
+	root_ = nullptr;
+}
+
+template <typename T>
+rb_tree<T>::~rb_tree()
+{
+	destroy(root_);
+}
+
+template <typename T>
+void rb_tree<T>::check_operator(std::ostream& stream, char op, T value)
+{
+	switch (op)
+	{
+	case '+':
+	{
+		insert(value);
+		break;
+	}
+	case '?':
+	{
+		if (find(value))
+		{
+			stream << "true";
+		}
+		else stream << "false";
+		break;
+	}
+	case '=':
+	{
+		print(stream, 0, root_);
+		break;
+	}
+	case 'q':
+	{
+		exit(0);
+		break;
+	}
+	default:
+	{
+		stream << "Error of use operator";
+	}
+	}
+}
+
+template <typename T>
+void rb_tree<T>::print(std::ostream& stream, int level, node_t* node)
+{
+	if (node == nullptr)
+		return;
+
+	print(stream, level + 1, node->right);
+
+	for (unsigned int i = 0; i < level; i++) {
+		stream << "---";
+	}
+	if (node->color == false)
+		stream << node->value << "B" << std::endl;
+	if (node->color == true)
+		stream << node->value << "R" << std::endl;
+	print(stream, level + 1, node->left);
+}
+
+template <typename T>
+bool rb_tree<T>::find(T value) const
+{
+	node_t* node = root_;
+	while (node != nullptr)
+	{
+		if (node->value == value)
+		{
+			return true;
+		}
+		else
+		{
+			if (value <= node->value)
+			{
+				node = node->left;
+			}
+			else
+				node = node->right;
+		}
+	}
+	return false;
+}
+
+template <typename T>
+void rb_tree<T>::destroy(node_t* node)
+{
+	if (node != nullptr)
+	{
+		if (node->left)
+		{
+			destroy(node->left);
+		}
+		if (node->right)
+		{
+			destroy(node->right);
+		}
+		delete node;
+	}
+}
+
+template <typename T>
+bool rb_tree<T>::equal(node_t* first, node_t* second) const {
+	if (first == nullptr && second == nullptr) return(true);
+	else if (first != nullptr && second != nullptr)
+	{
+		return(
+			first->value == second->value &&
+			equal(first->left, second->left) &&
+			equal(first->right, second->right)
+			);
+	}
+	else return false;
+}
+
+template <typename T>
+auto rb_tree<T>::operator==(rb_tree const & other) const {
+	node_t* first = root_; node_t* second = other.root_;
+	return (equal(first, second));
+}
+
+
+
