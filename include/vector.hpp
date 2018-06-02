@@ -473,6 +473,8 @@ public:
 	void delete_case3(node_t* n)
 	{
 		node_t* s = sibling(n);
+		if (s == nullptr)
+     		return;
 		if (s->left == nullptr || s->right == nullptr)
 			return;
 		if ((n->parent->color == false) && (s->color == false) && (s->left->color == false)
