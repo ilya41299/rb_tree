@@ -1,3 +1,5 @@
+#include "stdafx.h"
+#include <iostream>
 #include <iostream>
 #include <algorithm>
 #include <cassert>
@@ -205,238 +207,193 @@ public:
 
 	// Для удаления
 
-	bool remove(T value)
-	{
-		if (root_ == nullptr)
-		{
-			return false;
+	void replace_node(node_t* node, node_t* child) {
+		node_t* g = grandparent(child);
+		node_t* node_child2;
+		if (child->left)
+			node_child2 = child->left;
+		else
+			node_child2 = child->right;
+		child->parent = g;
+		if (g) {
+			if (g->left == node)
+				g->left = child;
+			else
+				g->right = child;
 		}
 		else
-		{
-			node_t* param1 = nullptr;
-			node_t* param2 = root_;
-			// Цикл поиска удаляемого эл-та
-			while (1)
-			{
-				if (param2->value == value)
-				{
-					break;
-				}
-				else if (value > param2->value)
-				{
-					param1 = param2;
-					param2 = param2->right;
-				}
-				else if (value < param2->value)
-				{
-					param1 = param2;
-					param2 = param2->left;
-				}
-				if (param2 == nullptr)
-				{
-					return false;
-				}
+			root_ = child;
+		if (node->right == child) {
+			if (node_child2) {
+				child->right = node_child2;
+				node_child2->parent = child;
+				node_child2->right = node;
+				node->parent = node_child2;
+				node->right = nullptr;
 			}
-			//если у найденного эл-та нет детей и он яв-ся корнем - занулим корень
-			if (param2->left == nullptr && param2->right == nullptr)
-			{
-				if (param2 == root_)
-				{
-					node_t* node = root_;
-					root_ = nullptr;
-					delete node;
-				}
-				else
-				{
-					// если удаляемый эл-т левый сын отца
-					if (param1->left == param2)
-					{
-						if (param2->color == false) //если уд. эл-т чёрный обращаемся к кейсу удаления
-							delete_case1(param2);
-						if (param2->parent->left == param2) // если удаляемый - левый сын, занулим левую ветвь и удалим эл-т
-							param2->parent->left = nullptr;
-						else if (param2->parent->right == param2) // иначе наоборот
-							param2->parent->right = nullptr;
-						delete param2;
-					}
-					if (param1->right == param2) // аналогично для правого
-					{
-						if (param2->color == false)
-							delete_case1(param2);
-						if (param2->parent->left == param2)
-							param2->parent->left = nullptr;
-						else if (param2->parent->right == param2)
-							param2->parent->right = nullptr;
-						delete param2;
-					}
-				}
+
+			else {
+				child->right = node;
+				node->right = nullptr;
+				node->parent = child;
 			}
-			else if ((param2->left != nullptr && param2->right == nullptr) || (param2->left == nullptr && param2->right != nullptr)) // есть только один сын
-			{
-				if (param2 == root_) // Если удаляем корень то ставим на его место ед. сына
-				{
-					node_t* node = root_;
-					if (param2->left != nullptr)
-					{
-						root_ = param2->left;
-						root_->parent = nullptr;
-					}
-					else if (param2->right != nullptr)
-					{
-						root_ = param2->right;
-						root_->parent = nullptr;
-					}
-					delete node;
-				}
-				else
-				{
-					if (param1->left == param2)
-					{
-						if (param2->left != nullptr)
-						{
-							param1->left = param2->left;
-							param2->left->parent = param1;
-							if (param2->color == false)
-							{
-								if (param1->left->color == true)
-									param1->left->color = false;
-								else
-									delete_case1(param1->left);
-							}
-							delete param2;
-						}
-						else if (param2->right != nullptr)
-						{
-							param1->left = param2->right;
-							param2->right->parent = param1;
-							if (param2->color == false)
-							{
-								if (param1->left->color == true)
-									param1->left->color = false;
-								else
-									delete_case1(param1->left);
-							}
-							delete param2;
-						}
-					}
-					else if (param1->right == param2)
-					{
-						if (param2->left != nullptr)
-						{
-							param1->right = param2->left;
-							param2->left->parent = param1;
-							if (param2->color == false)
-							{
-								if (param1->right->color == true)
-									param1->right->color = false;
-								else
-									delete_case1(param1->right);
-							}
-							delete param2;
-						}
-						else if (param2->right != nullptr)
-						{
-							param1->right = param2->right;
-							param2->right->parent = param1;
-							if (param2->color == false)
-							{
-								if (param1->right->color == true)
-									param1->right->color = false;
-								else
-									delete_case1(param1->right);
-							}
-							delete param2;
-						}
-					}
-				}
+		}
+		else {
+			if (node_child2) {
+				child->left = node_child2;
+				node_child2->parent = child;
+				node_child2->left = node;
+				node->parent = node_child2;
+				node->left = nullptr;
 			}
-			else if (param2->left != nullptr && param2->right != nullptr)
-			{
-				node_t* node = param2;
-				param1 = param2;
-				param2 = param2->right;
-				if (param2->left == nullptr)
-				{
-					if (param2->right == nullptr)
-					{
-						bool tr = node->color;
-						node->value = param2->value;
-						node->color = param2->color;
-						node->right = nullptr;
-						delete param2;
-						if (tr == false)
-						{
-							if (node->color == true)
-								node->color = false;
-							else
-								delete_case1(node);
-						}
-					}
-					else
-					{
-						bool tr = node->color;
-						node->value = param2->value;
-						node->color = param2->color;
-						node->right = param2->right;
-						param2->right->parent = node;
-						delete param2;
-						if (tr == false)
-						{
-							if (node->color == true)
-								node->color = false;
-							else
-								delete_case1(node);
-						}
-					}
-				}
-				else
-				{
-					while (param2->left != nullptr)
-					{
-						param1 = param2;
-						param2 = param2->left;
-					}
-					if (param2->right == nullptr)
-					{
-						bool tr = node->color;
-						node->value = param2->value;
-						node->color = param2->color;
-						param1->left = nullptr;
-						delete param2;
-						if (tr == false)
-						{
-							if (node->color == true)
-								node->color = false;
-							else
-								delete_case1(node);
-						}
-					}
-					else
-					{
-						bool tr = node->color;
-						node->value = param2->value;
-						node->color = param2->color;
-						param1->left = param2->right;
-						param2->right->parent = param1;
-						delete param2;
-						if (tr == false)
-						{
-							if (node->color == true)
-								node->color = false;
-							else
-								delete_case1(node);
-						}
-					}
-				}
+			else {
+				child->left = node;
+				node->left = nullptr;
+				node->parent = child;
 			}
-			return true;
 		}
 	}
+	void free(node_t*& node) {
+		if (node == root_) {
+			root_ = nullptr;
+			delete root_;
+			return;
+		}
+		node_t* p = node->parent;
+		node->parent = nullptr;
+		if (p->left == node) {
+			if (node->left)
+				p->left = node->left;
+			else
+				p->left = nullptr;
+		}
+		else {
+			if (node->right)
+				p->right = node->right;
+			else
+				p->right = nullptr;
+		}
+		delete node;
+	}
 
+	void delete_one_child(node_t* node, node_t* child) {
+		if (child) {
+			replace_node(node, child);
+			if (node->color == false) {
+				if (child->color == true)
+					child->color = false;
+				else
+					delete_case1(child);
+			}
+		}
+		free(node);
+	}
+	bool remove(int key) {
+		if (!(root_)) {
+			throw std::invalid_argument("root_ = nullptr");
+		}
+		node_t* vetka = root_;
+		while (vetka) {
+			if (vetka->value == key)
+				break;
+			else {
+				if (key < vetka->value)
+					vetka = vetka->left;
+				else
+					vetka = vetka->right;
+			}
+			if (!(vetka))
+				return false;
+		}
+		if (vetka) {
+			if (vetka->left == nullptr && vetka->right != nullptr) {
+				delete_one_child(vetka, vetka->right);
+			}
+			else if (vetka->right == nullptr && vetka->left != nullptr) {
+				delete_one_child(vetka, vetka->left);
+			}
+			else if (vetka->left == nullptr && vetka->right == nullptr) {
+				delete_case1(vetka);
+				free(vetka);
+			}
+			else if (vetka->right && vetka->left) {
+				node_t* child = choose_left_child(vetka);
+				swap_child_parent(vetka, child);
+				if (vetka->right != nullptr && vetka->left == nullptr)
+					delete_one_child(vetka, vetka->right);
+				else if (vetka->left != nullptr && vetka->right == nullptr)
+					delete_one_child(vetka, vetka->left);
+				else if (vetka->left == nullptr && vetka->right == nullptr) {
+					delete_case1(vetka);
+					if (vetka->color == true) {
+						if (child->right == vetka)
+							child->left->color = true;
+					}
 
+					free(vetka);
+				}
+				if (child == root_ && child->color == true)
+					child->color = false;
+			}
 
+		}
+		else
+			return false;
+
+		return true;
+	}
+	node_t* choose_left_child(node_t* node) {
+		if (node->right) {
+			node_t* vetka = node->right;
+
+			while (vetka->left) {
+				vetka = vetka->left;
+			}
+			return vetka;
+		}
+		else
+			return nullptr;
+	}
+	void swap_child_parent(node_t* node, node_t* child) {
+		node_t* node_parent = node->parent;
+		node_t* parent_child = child->parent;
+		node_t* right_child = node->right;
+		child->parent = node_parent;
+		if (node_parent) {
+			if (node_parent->right == node) {
+				node_parent->right = child;
+			}
+			else {
+				node_parent->left = child;
+			}
+		}
+		else
+			root_ = child;
+		node->right = child->right;
+		if (child->right)
+			child->right->parent = node;
+		if (node->left) {
+			node->left->parent = child;
+			child->left = node->left;
+			node->left = nullptr;
+		}
+
+		if (node != parent_child) {
+			if (parent_child->left == child)
+				parent_child->left = node;
+			else
+				parent_child->right = node;
+			node->parent = parent_child;
+			child->right = right_child;
+			right_child->parent = child;
+		}
+		else {
+			child->right = node;
+			node->parent = child;
+		}
+	}
 	// поиск брата n
-	node_t* sibling(node_t* n) 
+	node_t* sibling(node_t* n)
 	{
 		if (n == n->parent->left)
 			return n->parent->right;
@@ -445,11 +402,10 @@ public:
 	}
 
 	//N стал корнем. В этом случае, все сделано. Мы удалили один чёрный узел из каждого пути и новый корень является чёрным узлом
-	void delete_case1(node_t* n)
-	{
-		if (n->parent != nullptr)
-			delete_case2(n);
-	}
+	 void delete_case1(node_t* node) {
+    if (node->parent != nullptr)
+      delete_case2(node);
+  }
 
 	//Если его брат красный, то вращаем вокруг отца N либо влево, либо вправо.
 	void delete_case2(node_t* n)
@@ -474,7 +430,7 @@ public:
 	{
 		node_t* s = sibling(n);
 		if (s == nullptr)
-     		return;
+			return;
 		if (s->left == nullptr || s->right == nullptr)
 			return;
 		if ((n->parent->color == false) && (s->color == false) && (s->left->color == false)
@@ -526,7 +482,7 @@ public:
 		}
 		delete_case6(n);
 	}
-	
+
 	// Если N и S - чёрные, а один (существующий) из Sr и Sl - красный, то поворот вокруг P 
 	// Если у S был правый сын, то поворот влево
 	// Если левый - вправо
@@ -707,16 +663,10 @@ bool rb_tree<T>::find(T value) const
 template <typename T>
 void rb_tree<T>::destroy(node_t* node)
 {
-	if (node != nullptr)
+	if (node != nullptr) 
 	{
-		if (node->left)
-		{
-			destroy(node->left);
-		}
-		if (node->right)
-		{
-			destroy(node->right);
-		}
+		destroy(node->left);
+		destroy(node->right);
 		delete node;
 	}
 }
@@ -740,6 +690,3 @@ auto rb_tree<T>::operator==(rb_tree const & other) const {
 	node_t* first = root_; node_t* second = other.root_;
 	return (equal(first, second));
 }
-
-
-
