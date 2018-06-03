@@ -1,11 +1,11 @@
 #include <iostream>
-#include <iostream>
 #include <algorithm>
 #include <cassert>
-
 template <typename T>
-class rb_tree {
-	struct node_t {
+class rb_tree
+{
+	struct node_t 
+	{
 		node_t * left;
 		node_t * right;
 		node_t * parent;
@@ -66,7 +66,8 @@ public:
 			root_ = n->right;
 		}
 		vetka->parent = n->parent; /* при этом, возможно, vetka становится корнем дерева */
-		if (n->parent != nullptr) { // если у n есть отец
+		if (n->parent != nullptr) // если у n есть отец
+		{ 
 			if (n->parent->left == n) // и n-его левый сын
 				n->parent->left = vetka; // перенаправим левый указатель отца на временный элемент
 			else // если же n-правый сын
@@ -90,7 +91,8 @@ public:
 			root_ = n->left;
 		}
 		vetka->parent = n->parent;
-		if (n->parent != nullptr) {
+		if (n->parent != nullptr)
+		{
 			if (n->parent->left == n)
 				n->parent->left = vetka;
 			else
@@ -169,14 +171,15 @@ public:
 	{
 		node_t *g = grandparent(vetka);
 
-		if ((vetka == vetka->parent->right) && (vetka->parent == g->left)) {
+		if ((vetka == vetka->parent->right) && (vetka->parent == g->left)) 
+		{
 			rotate_left(vetka->parent);
 
 			vetka = vetka->left;
 		}
-		else if ((vetka == vetka->parent->left) && (vetka->parent == g->right)) {
+		else if ((vetka == vetka->parent->left) && (vetka->parent == g->right)) 
+		{
 			rotate_right(vetka->parent);
-
 			vetka = vetka->right;
 		}
 		insert_case5(vetka);
@@ -196,17 +199,20 @@ public:
 
 		vetka->parent->color = false;
 		g->color = true;
-		if ((vetka == vetka->parent->left) && (vetka->parent == g->left)) {
+		if ((vetka == vetka->parent->left) && (vetka->parent == g->left)) 
+		{
 			rotate_right(g);
 		}
-		else {
+		else
+		{
 			rotate_left(g);
 		}
 	}
 
 	// Для удаления
-
-	void replace_node(node_t* node, node_t* child) {
+	// Если у удаляемого элемета один сын replace_node меняет местами сына и удаляемый элемент
+	void replace_node(node_t* node, node_t* child) 
+	{
 		node_t* g = grandparent(child);
 		node_t* node_child2;
 		if (child->left)
@@ -222,8 +228,10 @@ public:
 		}
 		else
 			root_ = child;
-		if (node->right == child) {
-			if (node_child2) {
+		if (node->right == child) 
+		{
+			if (node_child2) 
+			{
 				child->right = node_child2;
 				node_child2->parent = child;
 				node_child2->right = node;
@@ -231,42 +239,51 @@ public:
 				node->right = nullptr;
 			}
 
-			else {
+			else 
+			{
 				child->right = node;
 				node->right = nullptr;
 				node->parent = child;
 			}
 		}
-		else {
-			if (node_child2) {
+		else 
+		{
+			if (node_child2)
+			{
 				child->left = node_child2;
 				node_child2->parent = child;
 				node_child2->left = node;
 				node->parent = node_child2;
 				node->left = nullptr;
 			}
-			else {
+			else 
+			{
 				child->left = node;
 				node->left = nullptr;
 				node->parent = child;
 			}
 		}
 	}
-	void free(node_t*& node) {
-		if (node == root_) {
+	//Функция free удаляет элемент после всех перекрасок, перестановок и поворотов
+	void free(node_t*& node)
+	{
+		if (node == root_) 
+		{
 			root_ = nullptr;
 			delete root_;
 			return;
 		}
 		node_t* p = node->parent;
 		node->parent = nullptr;
-		if (p->left == node) {
+		if (p->left == node)
+		{
 			if (node->left)
 				p->left = node->left;
 			else
 				p->left = nullptr;
 		}
-		else {
+		else 
+		{
 			if (node->right)
 				p->right = node->right;
 			else
@@ -275,10 +292,13 @@ public:
 		delete node;
 	}
 
-	void delete_one_child(node_t* node, node_t* child) {
+	//Если удаляемый элемент имеет одного сына, то используем delete_one_child
+	void delete_one_child(node_t* node, node_t* child) 
+	{
 		if (child) {
 			replace_node(node, child);
-			if (node->color == false) {
+			if (node->color == false) 
+			{
 				if (child->color == true)
 					child->color = false;
 				else
@@ -287,15 +307,22 @@ public:
 		}
 		free(node);
 	}
-	bool remove(int key) {
-		if (!(root_)) {
+
+	bool remove(int key) 
+	{
+		//Проверим существование корня дерева
+		if (!(root_))
+		{
 			throw std::invalid_argument("root_ = nullptr");
 		}
 		node_t* vetka = root_;
-		while (vetka) {
+		//Цикл поиска удаляемого элемента
+		while (vetka) 
+		{
 			if (vetka->value == key)
 				break;
-			else {
+			else
+			{
 				if (key < vetka->value)
 					vetka = vetka->left;
 				else
@@ -304,34 +331,44 @@ public:
 			if (!(vetka))
 				return false;
 		}
+		//Если удаляемый элемент найден, то подбираем способ его удаления
 		if (vetka) {
-			if (vetka->left == nullptr && vetka->right != nullptr) {
+			//У удаляемого элемента один сын - delete_one_child
+			if (vetka->left == nullptr && vetka->right != nullptr) 
+			{
 				delete_one_child(vetka, vetka->right);
 			}
-			else if (vetka->right == nullptr && vetka->left != nullptr) {
+			else if (vetka->right == nullptr && vetka->left != nullptr)
+			{
 				delete_one_child(vetka, vetka->left);
 			}
-			else if (vetka->left == nullptr && vetka->right == nullptr) {
+			//Если удаляемый элемент не имеет детей - запускаем кейсы удаления
+			else if (vetka->left == nullptr && vetka->right == nullptr)
+			{
 				delete_case1(vetka);
 				free(vetka);
 			}
-			else if (vetka->right && vetka->left) {
-				node_t* child = choose_left_child(vetka);
-				swap_child_parent(vetka, child);
-				if (vetka->right != nullptr && vetka->left == nullptr)
+			//Если существуют оба сына, то 
+			else if (vetka->right && vetka->left) 
+			{
+				node_t* child = choose_left_child(vetka);// Находим в правом поддереве крайнего левого сына
+				swap_child_parent(vetka, child); //Меняем местами удаляемый элемент и сына
+				if (vetka->right != nullptr && vetka->left == nullptr)//Теперь если у помещенного вниз отца есть правый сын
 					delete_one_child(vetka, vetka->right);
-				else if (vetka->left != nullptr && vetka->right == nullptr)
+				else if (vetka->left != nullptr && vetka->right == nullptr)//или левый сын
 					delete_one_child(vetka, vetka->left);
-				else if (vetka->left == nullptr && vetka->right == nullptr) {
+				else if (vetka->left == nullptr && vetka->right == nullptr) //Но если есть два сына одновременно
+				{
 					delete_case1(vetka);
-					if (vetka->color == true) {
+					//Важно! Если удаляемый красный и у его сына есть красный сын
+					if (vetka->color == true) 
+					{
 						if (child->right == vetka)
 							child->left->color = true;
 					}
 
 					free(vetka);
 				}
-				if (child == root_ && child->color == true)
 					child->color = false;
 			}
 
@@ -341,11 +378,15 @@ public:
 
 		return true;
 	}
-	node_t* choose_left_child(node_t* node) {
-		if (node->right) {
+	//Только поиск в правом поддереве крайнего левого сына
+	node_t* choose_left_child(node_t* node) 
+	{
+		if (node->right) 
+		{
 			node_t* vetka = node->right;
 
-			while (vetka->left) {
+			while (vetka->left)
+			{
 				vetka = vetka->left;
 			}
 			return vetka;
@@ -353,16 +394,21 @@ public:
 		else
 			return nullptr;
 	}
-	void swap_child_parent(node_t* node, node_t* child) {
+	//Теперь меняет местами крайнего лвого сына в правом поддереве удаляемого элемента
+	void swap_child_parent(node_t* node, node_t* child)
+	{
 		node_t* node_parent = node->parent;
 		node_t* parent_child = child->parent;
 		node_t* right_child = node->right;
 		child->parent = node_parent;
-		if (node_parent) {
-			if (node_parent->right == node) {
+		if (node_parent)
+		{
+			if (node_parent->right == node)
+			{
 				node_parent->right = child;
 			}
-			else {
+			else
+			{
 				node_parent->left = child;
 			}
 		}
@@ -371,26 +417,30 @@ public:
 		node->right = child->right;
 		if (child->right)
 			child->right->parent = node;
-		if (node->left) {
+		if (node->left)
+		{
 			node->left->parent = child;
 			child->left = node->left;
 			node->left = nullptr;
 		}
 
-		if (node != parent_child) {
+		if (node != parent_child) 
+		{
 			if (parent_child->left == child)
 				parent_child->left = node;
 			else
-				parent_child->right = node;
+			parent_child->right = node;
 			node->parent = parent_child;
 			child->right = right_child;
 			right_child->parent = child;
 		}
-		else {
+		else 
+		{
 			child->right = node;
 			node->parent = child;
 		}
 	}
+
 	// поиск брата n
 	node_t* sibling(node_t* n)
 	{
@@ -401,10 +451,11 @@ public:
 	}
 
 	//N стал корнем. В этом случае, все сделано. Мы удалили один чёрный узел из каждого пути и новый корень является чёрным узлом
-	 void delete_case1(node_t* node) {
-    if (node->parent != nullptr)
-      delete_case2(node);
-  }
+	void delete_case1(node_t* node) 
+	{
+		if (node->parent != nullptr)
+			delete_case2(node);
+	}
 
 	//Если его брат красный, то вращаем вокруг отца N либо влево, либо вправо.
 	void delete_case2(node_t* n)
@@ -662,7 +713,7 @@ bool rb_tree<T>::find(T value) const
 template <typename T>
 void rb_tree<T>::destroy(node_t* node)
 {
-	if (node != nullptr) 
+	if (node != nullptr)
 	{
 		destroy(node->left);
 		destroy(node->right);
