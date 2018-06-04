@@ -294,8 +294,12 @@ public:
 			result_node = node->right;
 			link(node->right, node->parent);
 		}
-
-		delete node;
+		else if(node==root_)
+		{
+			delete node;
+			root_ = nullptr;
+		}
+		else delete node;
 
 		if (result_node && color == false) {
 			delete_case1(result_node);
