@@ -41,7 +41,7 @@ TEST_CASE("elements can be inserted in rb tree") {
       "------10B\n"
       "---------5R\n"};
   std::ostringstream stream;
-  tree.print(stream, 0, tree.root());
+  tree.print(stream);
   REQUIRE(stream.str() == out);
 }
 
@@ -64,7 +64,7 @@ TEST_CASE("elements can be removde from rb tree") {
       "2B\n"
       "---1B\n"};
   std::ostringstream stream;
-  tree.print(stream, 0, tree.root());
+  tree.print(stream);
   REQUIRE(stream.str() == out);
 }
 TEST_CASE("when brother is black and his sons") {
@@ -94,7 +94,7 @@ TEST_CASE("when brother is black and his sons") {
       "------1B\n"};
   std::ostringstream stream;
   std::ostringstream stream2;
-  tree.print(stream, 0, tree.root());
+  tree.print(stream);
   REQUIRE(stream.str() == out);
   std::string out2{
       "---7B\n"
@@ -103,7 +103,7 @@ TEST_CASE("when brother is black and his sons") {
       "---2R\n"
       "------1B\n"};
   tree.remove(9);
-  tree.print(stream2, 0, tree.root());
+  tree.print(stream2);
   REQUIRE(stream2.str() == out2);
 }
 TEST_CASE("when brother is black and his right son is red") {
@@ -135,7 +135,7 @@ TEST_CASE("when brother is black and his right son is red") {
       "---------0R\n"};
   std::ostringstream stream;
   std::ostringstream stream2;
-  tree.print(stream, 0, tree.root());
+  tree.print(stream);
   REQUIRE(stream.str() == out);
  tree.remove(2);
   std::string out2 {
@@ -150,7 +150,7 @@ TEST_CASE("when brother is black and his right son is red") {
       "------1B\n"
       "---------0R\n"};
   
-  tree.print(stream2, 0, tree.root());
+  tree.print(stream2);
   
   REQUIRE(stream2.str() == out2);
   
@@ -194,7 +194,7 @@ TEST_CASE("when brother is red") {
       "---------0R\n"};
   std::ostringstream stream;
   std::ostringstream stream2;
-  tree.print(stream, 0, tree.root());
+  tree.print(stream);
   REQUIRE(stream.str() == out);
   std::string out1{
       "---------11R\n"
@@ -213,6 +213,6 @@ TEST_CASE("when brother is red") {
       "---------1B\n"
       "------------0R\n"};
   tree.remove(2);
-  tree.print(stream2, 0, tree.root());
+    tree.print(stream2);
   REQUIRE(stream2.str() == out1);
 }
