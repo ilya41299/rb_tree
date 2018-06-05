@@ -15,6 +15,7 @@ class rb_tree
 	};
 	node_t *root_;
 	node_t * search(T value) const;
+	void print(std::ostream& stream, unsigned int level, node_t* node) const;
 public:
 	rb_tree();
 	node_t* root()
@@ -25,7 +26,7 @@ public:
 	void insert(T value);
 	bool find(T value) const;
 	bool equal(node_t* a, node_t* b) const;
-	void print(std::ostream& stream, unsigned int level, node_t* node);
+	
 	void destroy(node_t* node);
 	~rb_tree();
 	rb_tree(std::initializer_list<T> keys);
@@ -211,10 +212,14 @@ public:
 		}
 	}
 
-	void transplant(node_t * node, node_t * parent)
+	void transplant(node_t * node, node_t * parent, node_t * new_node)
 	{
 		if (!node) {
-			return;
+			if(new_node==parent->left)
+			parent->left = node; //Пофиксил, чтобы отрезать связь перемещаемого эл-та с отцом
+			
+			else parent->right = node;
+				return;
 		}
 
 		node_t * child = link(node, parent);
@@ -236,6 +241,7 @@ public:
 
 			child->left = nullptr;
 			child->right = nullptr;
+
 		}
 	}
 
@@ -283,8 +289,8 @@ public:
 			auto new_node = min(node->right);
 			color = new_node->color;
 			result_node = new_node->right;
-			transplant(new_node->right, new_node->parent);
-			transplant(new_node, node->parent);
+			transplant(new_node->right, new_node->parent, new_node);
+			transplant(new_node, node->parent, nullptr);
 		}
 		else if (node->left) {
 			result_node = node->left;
@@ -294,14 +300,33 @@ public:
 			result_node = node->right;
 			link(node->right, node->parent);
 		}
+
 		else if(node==root_)
 		{
 			delete node;
 			root_ = nullptr;
+			return;
+		}
+		else if (node->parent->left == node) 
+		{
+			auto parent = node->parent;
+			delete node;
+			parent->left = nullptr;
+		}
+		else if (node->parent->right == node)
+		{
+			auto parent = node->parent;
+			delete node;
+			parent->right = nullptr;
 		}
 		else delete node;
-
+		
+		if (root_->color == true) 
+		{
+			root_->color = false;
+		}
 		if (result_node && color == false) {
+			result_node->color = false;
 			delete_case1(result_node);
 		}
 	}
@@ -612,7 +637,7 @@ void rb_tree<T>::check_operator(std::ostream& stream, char op, T value)
 }
 
 template <typename T>
-void rb_tree<T>::print(std::ostream& stream, unsigned int level, node_t* node)
+void rb_tree<T>::print(std::ostream& stream, unsigned int level, node_t* node) const
 {
 	if (node == nullptr)
 		return;
